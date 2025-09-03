@@ -16,8 +16,18 @@ CREATE TABLE IF NOT EXISTS voluntarios (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   nombre TEXT NOT NULL,
   email TEXT,
+  telefono TEXT,
+  disponi
+);
+
+CREATE TABLE IF NOT EXISTS familias(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nombre_representante TEXT NOT NULL,
+  email TEXT,
   telefono TEXT
 );
+
+
 
 CREATE TABLE IF NOT EXISTS donaciones (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
