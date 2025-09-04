@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-    import { exportToPDF, exportToExcel } from "../utils/exportUtils";
+import { exportToPDF, exportToExcel } from "../utils/exportUtils";
 
 import {
-  PieChart, Pie, Cell, Tooltip, Legend,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
 } from "recharts";
 
 const API = "http://localhost:5000/api";
@@ -24,46 +32,67 @@ export default function Dashboard() {
   }, []);
 
   // Datos calculados
-  const totalDonaciones = donaciones.reduce((acc, d) => acc + (d.valor || 0), 0);
+  const totalDonaciones = donaciones.reduce(
+    (acc, d) => acc + (d.valor || 0),
+    0
+  );
 
   const donacionesTipo = [
-    { name: "Económicas", value: donaciones.filter(d => d.tipo === "economica").length },
-    { name: "En especie", value: donaciones.filter(d => d.tipo === "en_especie").length },
+    {
+      name: "Económicas",
+      value: donaciones.filter((d) => d.tipo === "economica").length,
+    },
+    {
+      name: "En especie",
+      value: donaciones.filter((d) => d.tipo === "en_especie").length,
+    },
   ];
 
   const transportesEstado = [
-    { name: "Disponible", value: transportes.filter(t => t.disponibilidad === "Disponible").length },
-    { name: "Ocupado", value: transportes.filter(t => t.disponibilidad === "Ocupado").length },
-    { name: "Mantenimiento", value: transportes.filter(t => t.disponibilidad === "Mantenimiento").length },
+    {
+      name: "Disponible",
+      value: transportes.filter((t) => t.disponibilidad === "Disponible")
+        .length,
+    },
+    {
+      name: "Ocupado",
+      value: transportes.filter((t) => t.disponibilidad === "Ocupado").length,
+    },
+    {
+      name: "Mantenimiento",
+      value: transportes.filter((t) => t.disponibilidad === "Mantenimiento")
+        .length,
+    },
   ];
 
-  const donacionesValor = donaciones.map(d => ({
+  const donacionesValor = donaciones.map((d) => ({
     descripcion: d.descripcion || "Donación",
     valor: d.valor || 0,
   }));
 
   return (
-
     <div className="card shadow-sm mt-4">
-        <div className="d-flex gap-2 mb-3">
-  <button
-    className="btn btn-outline-danger"
-    onClick={() => exportToPDF(voluntarios, donaciones, transportes)}
-  >
-    📄 Exportar PDF
-  </button>
-  <button
-    className="btn btn-outline-success"
-    onClick={() => exportToExcel(voluntarios, donaciones, transportes)}
-  >
-    📊 Exportar Excel
-  </button>
-  
-    <Link to="/calendar" className="btn btn-outline-primary">
-    CALENDARI
-    </Link>
+      <div className="d-flex gap-2 mb-3">
+        <button
+          className="btn btn-outline-danger"
+          onClick={() => exportToPDF(voluntarios, donaciones, transportes)}
+        >
+          📄 Exportar PDF
+        </button>
+        <button
+          className="btn btn-outline-success"
+          onClick={() => exportToExcel(voluntarios, donaciones, transportes)}
+        >
+          📊 Exportar Excel
+        </button>
 
-</div>
+        <Link to="/calendar" className="btn btn-outline-primary">
+          CALENDARI
+        </Link>
+        <Link to="/card" className="btn btn-outline-primary">
+          EMOCIONES
+        </Link>
+      </div>
 
       <div className="card-body">
         <h2 className="h4 mb-4">📊 Dashboard de Gestión</h2>

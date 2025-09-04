@@ -11,7 +11,7 @@ export default function Transportes() {
     lng: ""
   });
 
-  // Array d'esdeveniments/transports
+
   const [transportes, setTransportes] = useState([]);
 
   const handleSubmit = (e) => {
@@ -19,7 +19,7 @@ export default function Transportes() {
     if (!form.nombre.trim()) return alert("El vehículo es obligatorio");
     if (!form.fechaInicio || !form.fechaFin) return alert("Les dates són obligatòries");
 
-    // Afegeix el transport a l'array
+
     setTransportes(prev => [
       ...prev,
       {
@@ -28,7 +28,6 @@ export default function Transportes() {
       }
     ]);
 
-    // Reinicia el formulari
     setForm({
       nombre: "",
       servicio: "Otros",
@@ -42,10 +41,9 @@ export default function Transportes() {
   return (
     <div className="card shadow-sm">
       <div className="card-body">
-        <h2 className="h4 mb-3">Transportes</h2>
+        <h2 className="h4 mb-3">Voluntariado</h2>
 
         <form onSubmit={handleSubmit} className="row g-2 mb-3">
-          {/* ...inputs igual que abans... */}
           <div className="col-md-4">
             <input
               className="form-control"
