@@ -6,6 +6,7 @@ import MapaTransportes from "./components/MapaTransportes";
 
 export default function App() {
   return (
+    <>
     <div className="container py-4">
       <h1 className="text-center mb-4">Fundación Nexa – Gestión</h1>
 
@@ -18,5 +19,12 @@ export default function App() {
         <div className="col-12"><Transportes /></div>
       </div>
     </div>
+
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </Router>
+    </>
   );
 }
