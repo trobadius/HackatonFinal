@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
     import { exportToPDF, exportToExcel } from "../utils/exportUtils";
 
@@ -57,6 +58,11 @@ export default function Dashboard() {
   >
     📊 Exportar Excel
   </button>
+  
+    <Link to="/calendar" className="btn btn-outline-primary">
+    CALENDARI
+    </Link>
+
 </div>
 
       <div className="card-body">
