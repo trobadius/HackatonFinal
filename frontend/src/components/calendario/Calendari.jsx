@@ -1,23 +1,46 @@
 //pg de la que descarregar calendar: https://fullcalendar.io/docs/getting-started 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import './CalendarPage.css';
+import ListaDeTareas from '../tareas/ListaDeTareas';
 
-const Calendari = () => {
+const Calendari = ({ transportes = [] }) => {
   const [events, setEvents] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showModalEsdeveniment, setShowModalEsdeveniment] = useState(false);
+  const [showModalTasca, setShowModalTasca] = useState(false);
   const [taskForm, setTaskForm] = useState({
     title: '',
     startDate: '',
     endDate: '',
     startTime: '',
-    endTime: ''
+    endTime: '',
+    user: ''
   });
 
-  // Afegir nova tasca al calendari
+  // Actualitza els events quan canvien els transports
+  useEffect(() => {
+    const eventsFromTransportes = transportes
+      .filter(t => t.fechaInicio && t.fechaFin)
+      .map(t => ({
+        id: t.id,
+        title: t.nombre || t.vehiculo || "Transport",
+        start: t.fechaInicio,
+        end: t.fechaFin,
+        backgroundColor: '#e3f2fd',
+        borderColor: '#2196f3',
+        extendedProps: {
+          servicio: t.servicio,
+          lat: t.lat,
+          lng: t.lng
+        }
+      }));
+    setEvents(eventsFromTransportes);
+  }, [transportes]);
+
+  // Mantinc la funció d'afegir esdeveniment manual
   const handleAddTask = (e) => {
     e.preventDefault();
     if (
@@ -28,9 +51,9 @@ const Calendari = () => {
       !taskForm.endTime
     ) return;
 
-    // Combina data i hora per a FullCalendar
     const start = `${taskForm.startDate}T${taskForm.startTime}`;
     const end = `${taskForm.endDate}T${taskForm.endTime}`;
+    const user = taskForm.user || 'usuari_exemple';
 
     setEvents(prev => [
       ...prev,
@@ -39,6 +62,7 @@ const Calendari = () => {
         title: taskForm.title,
         start,
         end,
+        user,
         backgroundColor: '#e3f2fd',
         borderColor: '#2196f3'
       }
@@ -48,9 +72,10 @@ const Calendari = () => {
       startDate: '',
       endDate: '',
       startTime: '',
-      endTime: ''
+      endTime: '',
+      user: ''
     });
-    setShowModal(false);
+    setShowModalEsdeveniment(false);
   };
 
   return (
@@ -60,18 +85,25 @@ const Calendari = () => {
         <p>Afegix el teu esdeveniment al calendari</p>
         <div className="calendar-actions">
           <button 
-            onClick={() => setShowModal(true)}
+            onClick={() => setShowModalEsdeveniment(true)}
             className="create-reminder-btn"
           >
             ➕ Afegir esdeveniment
           </button>
+          <button 
+            onClick={() => setShowModalTasca(true)}
+            className="create-reminder-btn"
+          >
+            ➕ Afegir tasca
+          </button>
         </div>
-        {/* Modal per afegir tasca */}
-        {showModal && (
-          <div className="modal-overlay" onClick={() => setShowModal(false)}>
+        {/* ...modals igual que abans... */}
+        {showModalEsdeveniment && (
+          <div className="modal-overlay" onClick={() => setShowModalEsdeveniment(false)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
               <h3>Afegir esdeveniment</h3>
               <form onSubmit={handleAddTask}>
+                {/* ...inputs igual que abans... */}
                 <div className="form-group">
                   <label>Títol del teu esdeveniment:</label>
                   <input
@@ -118,8 +150,17 @@ const Calendari = () => {
                     required
                   />
                 </div>
+                <div className="form-group">
+                  <label>Usuari (simulat):</label>
+                  <input
+                    type="text"
+                    value={taskForm.user}
+                    onChange={e => setTaskForm(prev => ({ ...prev, user: e.target.value }))}
+                    placeholder="Nom d'usuari o id"
+                  />
+                </div>
                 <div className="modal-actions">
-                  <button type="button" onClick={() => setShowModal(false)} className="cancel-btn">
+                  <button type="button" onClick={() => setShowModalEsdeveniment(false)} className="cancel-btn">
                     Cancel·lar
                   </button>
                   <button type="submit" className="confirm-btn">
@@ -127,6 +168,19 @@ const Calendari = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+        {showModalTasca && (
+          <div className="modal-overlay" onClick={() => setShowModalTasca(false)}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <h3>Llista de tasques</h3>
+              <ListaDeTareas />
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowModalTasca(false)} className="cancel-btn">
+                  Tancar
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -148,11 +202,11 @@ const Calendari = () => {
           eventDisplay="block"
           dayMaxEvents={3}
           moreLinkClick="popover"
+          eventClick={() => setShowModalTasca(true)}
         />
       </div>
-
     </div>
   );
 };
 
-export default Calendari
+export default Calendari;
