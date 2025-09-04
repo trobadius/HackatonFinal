@@ -10,7 +10,7 @@ const transporteIcon = new L.Icon({
   iconSize: [30, 30],
 });
 
-const API = "http://localhost:5000/api/transportes";
+const API = "http://localhost:5000/api/mapa";
 
 export default function MapaTransportes() {
   const [transportes, setTransportes] = useState([]);
@@ -24,7 +24,7 @@ export default function MapaTransportes() {
   return (
     <div className="card shadow-sm mt-4">
       <div className="card-body">
-        <h2 className="h4 mb-3">🌍 Ubicación de transportes</h2>
+        <h2 className="h4 mb-3">🌍 Ubicación de voluntarios</h2>
 
         <MapContainer
           center={[41.3888, 2.159]} // Barcelona como centro por defecto

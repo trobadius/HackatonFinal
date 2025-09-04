@@ -5,19 +5,51 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import './CalendarPage.css';
+import ListaDeTareas from '../tareas/ListaDeTareas';
 
 const Calendari = () => {
   const [events, setEvents] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showModalEsdeveniment, setShowModalEsdeveniment] = useState(false);
+  const [showModalTasca, setShowModalTasca] = useState(false);
   const [taskForm, setTaskForm] = useState({
     title: '',
     startDate: '',
     endDate: '',
     startTime: '',
-    endTime: ''
+    endTime: '',
+    user: '' // camp per vincular usuari
   });
 
-  // Afegir nova tasca al calendari
+  // Sincronitza les tasques de localStorage amb el calendari
+  React.useEffect(() => {
+    const tareasGuardades = localStorage.getItem('tareas');
+    if (tareasGuardades) {
+      try {
+        const tareasParsed = JSON.parse(tareasGuardades);
+        if (Array.isArray(tareasParsed)) {
+          // Les tasques es mostren com a events amb només el títol
+          // Ubica cada tasca al dia de creació (avui)
+          const today = new Date();
+          const yyyy = today.getFullYear();
+          const mm = String(today.getMonth() + 1).padStart(2, '0');
+          const dd = String(today.getDate()).padStart(2, '0');
+          const todayStr = `${yyyy}-${mm}-${dd}`;
+          const eventsFromTareas = tareasParsed.map(t => ({
+            id: t.id,
+            title: t.texto,
+            start: todayStr, // ubicació al calendari
+            backgroundColor: '#ffe0b2',
+            borderColor: '#ff9800'
+          }));
+          setEvents(eventsFromTareas);
+        }
+      } catch (e) {
+        console.log("Error en afegit la tasca")
+      }
+    }
+  }, []);
+
+  // Mantinc la funció d'afegir esdeveniment manual
   const handleAddTask = (e) => {
     e.preventDefault();
     if (
@@ -28,9 +60,9 @@ const Calendari = () => {
       !taskForm.endTime
     ) return;
 
-    // Combina data i hora per a FullCalendar
     const start = `${taskForm.startDate}T${taskForm.startTime}`;
     const end = `${taskForm.endDate}T${taskForm.endTime}`;
+    const user = taskForm.user || 'usuari_exemple';
 
     setEvents(prev => [
       ...prev,
@@ -39,6 +71,7 @@ const Calendari = () => {
         title: taskForm.title,
         start,
         end,
+        user,
         backgroundColor: '#e3f2fd',
         borderColor: '#2196f3'
       }
@@ -48,9 +81,10 @@ const Calendari = () => {
       startDate: '',
       endDate: '',
       startTime: '',
-      endTime: ''
+      endTime: '',
+      user: ''
     });
-    setShowModal(false);
+    setShowModalEsdeveniment(false);
   };
 
   return (
@@ -60,15 +94,21 @@ const Calendari = () => {
         <p>Afegix el teu esdeveniment al calendari</p>
         <div className="calendar-actions">
           <button 
-            onClick={() => setShowModal(true)}
+            onClick={() => setShowModalEsdeveniment(true)}
             className="create-reminder-btn"
           >
             ➕ Afegir esdeveniment
           </button>
+          <button 
+            onClick={() => setShowModalTasca(true)}
+            className="create-reminder-btn"
+          >
+            ➕ Afegir tasca
+          </button>
         </div>
-        {/* Modal per afegir tasca */}
-        {showModal && (
-          <div className="modal-overlay" onClick={() => setShowModal(false)}>
+        {/* Modal per afegir esdeveniment */}
+        {showModalEsdeveniment && (
+          <div className="modal-overlay" onClick={() => setShowModalEsdeveniment(false)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
               <h3>Afegir esdeveniment</h3>
               <form onSubmit={handleAddTask}>
@@ -118,8 +158,18 @@ const Calendari = () => {
                     required
                   />
                 </div>
+                {/* Camp per vincular usuari (simulat, vindrà del login) */}
+                <div className="form-group">
+                  <label>Usuari (simulat):</label>
+                  <input
+                    type="text"
+                    value={taskForm.user}
+                    onChange={e => setTaskForm(prev => ({ ...prev, user: e.target.value }))}
+                    placeholder="Nom d'usuari o id"
+                  />
+                </div>
                 <div className="modal-actions">
-                  <button type="button" onClick={() => setShowModal(false)} className="cancel-btn">
+                  <button type="button" onClick={() => setShowModalEsdeveniment(false)} className="cancel-btn">
                     Cancel·lar
                   </button>
                   <button type="submit" className="confirm-btn">
@@ -127,6 +177,20 @@ const Calendari = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+        {/* Modal per afegir tasca (amb ListaDeTareas) */}
+        {showModalTasca && (
+          <div className="modal-overlay" onClick={() => setShowModalTasca(false)}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <h3>Llista de tasques</h3>
+              <ListaDeTareas />
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowModalTasca(false)} className="cancel-btn">
+                  Tancar
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -148,6 +212,7 @@ const Calendari = () => {
           eventDisplay="block"
           dayMaxEvents={3}
           moreLinkClick="popover"
+          eventClick={() => setShowModalTasca(true)}
         />
       </div>
 

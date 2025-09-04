@@ -16,15 +16,15 @@ export default function App() {
             <MapaTransportes />
             <div className="row g-4 mt-4">
               <div className="col-12"><Voluntarios /></div>
-              <div className="col-12"><Donaciones /></div>
+              {/* <div className="col-12"><Donaciones /></div> */}
               <div className="col-12"><Transportes /></div>
             </div>
           </>
         } />
         <Route path="/calendar" element={<Calendari />} />
         <Route path="/voluntarios" element={<Voluntarios />} />
-        <Route path="/donaciones" element={<Donaciones />} />
-        <Route path="/transportes" element={<Transportes />} />
+        {/* <Route path="/donaciones" element={<Donaciones />} /> */}
+        {/* <Route path="/transportes" element={<Transportes />} /> */}
         <Route path="/mapa" element={<MapaTransportes />} />
       </Routes>
     </div>
