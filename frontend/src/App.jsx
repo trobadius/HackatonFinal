@@ -4,8 +4,7 @@ import Donaciones from "./components/Donaciones";
 import Transportes from "./components/Transportes";
 import Dashboard from "./components/Dashboard";
 import MapaTransportes from "./components/MapaTransportes";
-import Calendar from "./components/calendario/Calendari"; // Descomenta si tens aquest component
-
+import Calendari from "./components/calendario/Calendari"; 
 export default function App() {
   return (
     <div className="container py-4">
@@ -22,7 +21,7 @@ export default function App() {
             </div>
           </>
         } />
-        <Route path="/calendar" element={<Calendar />} />
+        <Route path="/calendar" element={<Calendari />} />
         <Route path="/voluntarios" element={<Voluntarios />} />
         <Route path="/donaciones" element={<Donaciones />} />
         <Route path="/transportes" element={<Transportes />} />
