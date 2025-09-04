@@ -36,9 +36,9 @@ export default function MapaVoluntarios() {
             .map((t) => (
               <Marker key={t.id} position={[t.lat, t.lng]}>
                 <Popup>
-                  🚐 <b>{t.vehiculo}</b> <br />
-                  👨 {t.conductor || "—"} <br />
-                  ⚡ {t.disponibilidad}
+                  🚐 <b>{t.nombre}</b> <br />
+                  👨 {t.servicio } <br />
+                  
                 </Popup>
               </Marker>
             ))}

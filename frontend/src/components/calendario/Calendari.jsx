@@ -1,13 +1,13 @@
 //pg de la que descarregar calendar: https://fullcalendar.io/docs/getting-started 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import './CalendarPage.css';
 import ListaDeTareas from '../tareas/ListaDeTareas';
 
-const Calendari = () => {
+const Calendari = ({ transportes = [] }) => {
   const [events, setEvents] = useState([]);
   const [showModalEsdeveniment, setShowModalEsdeveniment] = useState(false);
   const [showModalTasca, setShowModalTasca] = useState(false);
@@ -17,38 +17,28 @@ const Calendari = () => {
     endDate: '',
     startTime: '',
     endTime: '',
-    user: '' // camp per vincular usuari
+    user: ''
   });
 
-  // Carrega automàticament els transports com a esdeveniments al calendari
-  React.useEffect(() => {
-    async function fetchTransportes() {
-      try {
-        const res = await fetch("http://localhost:5000/api/transportes");
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          const eventsFromTransportes = data
-            .filter(t => t.fechaInicio && t.fechaFin)
-            .map(t => ({
-              id: t.id,
-              title: t.nombre || t.vehiculo || "Transport",
-              start: t.fechaInicio,
-              end: t.fechaFin,
-              backgroundColor: '#e3f2fd',
-              borderColor: '#2196f3',
-              extendedProps: {
-                conductor: t.conductor,
-                disponibilidad: t.disponibilidad
-              }
-            }));
-          setEvents(eventsFromTransportes);
+  // Actualitza els events quan canvien els transports
+  useEffect(() => {
+    const eventsFromTransportes = transportes
+      .filter(t => t.fechaInicio && t.fechaFin)
+      .map(t => ({
+        id: t.id,
+        title: t.nombre || t.vehiculo || "Transport",
+        start: t.fechaInicio,
+        end: t.fechaFin,
+        backgroundColor: '#e3f2fd',
+        borderColor: '#2196f3',
+        extendedProps: {
+          servicio: t.servicio,
+          lat: t.lat,
+          lng: t.lng
         }
-      } catch (e) {
-        console.log("Error carregant transports", e);
-      }
-    }
-    fetchTransportes();
-  }, []);
+      }));
+    setEvents(eventsFromTransportes);
+  }, [transportes]);
 
   // Mantinc la funció d'afegir esdeveniment manual
   const handleAddTask = (e) => {
@@ -107,12 +97,13 @@ const Calendari = () => {
             ➕ Afegir tasca
           </button>
         </div>
-        {/* Modal per afegir esdeveniment */}
+        {/* ...modals igual que abans... */}
         {showModalEsdeveniment && (
           <div className="modal-overlay" onClick={() => setShowModalEsdeveniment(false)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
               <h3>Afegir esdeveniment</h3>
               <form onSubmit={handleAddTask}>
+                {/* ...inputs igual que abans... */}
                 <div className="form-group">
                   <label>Títol del teu esdeveniment:</label>
                   <input
@@ -159,7 +150,6 @@ const Calendari = () => {
                     required
                   />
                 </div>
-                {/* Camp per vincular usuari (simulat, vindrà del login) */}
                 <div className="form-group">
                   <label>Usuari (simulat):</label>
                   <input
@@ -181,7 +171,6 @@ const Calendari = () => {
             </div>
           </div>
         )}
-        {/* Modal per afegir tasca (amb ListaDeTareas) */}
         {showModalTasca && (
           <div className="modal-overlay" onClick={() => setShowModalTasca(false)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -216,9 +205,8 @@ const Calendari = () => {
           eventClick={() => setShowModalTasca(true)}
         />
       </div>
-
     </div>
   );
 };
 
-export default Calendari
+export default Calendari;

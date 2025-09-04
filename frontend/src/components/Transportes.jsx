@@ -1,59 +1,42 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-
-const API = "http://localhost:5000/api/transportes";
+import { useState } from "react";
+import Calendari from "./calendario/Calendari.jsx";
 
 export default function Transportes() {
-  const [list, setList] = useState([]);
   const [form, setForm] = useState({
-    vehiculo: "",
-    conductor: "",
-    disponibilidad: "",
+    nombre: "",
+    servicio: "Otros",
+    fechaInicio: "",
+    fechaFin: "",
+    lat: "",
+    lng: ""
   });
-  const [editingId, setEditingId] = useState(null);
 
-  const load = async () => {
-    const { data } = await axios.get(API);
-    setList(data);
-  };
+  // Array d'esdeveniments/transports
+  const [transportes, setTransportes] = useState([]);
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.vehiculo.trim()) return alert("El vehículo es obligatorio");
+    if (!form.nombre.trim()) return alert("El vehículo es obligatorio");
+    if (!form.fechaInicio || !form.fechaFin) return alert("Les dates són obligatòries");
 
-    if (editingId) {
-      await axios.put(`${API}/${editingId}`, form);
-      setEditingId(null);
-    } else {
-      await axios.post(API, form);
-    }
+    // Afegeix el transport a l'array
+    setTransportes(prev => [
+      ...prev,
+      {
+        ...form,
+        id: Date.now().toString()
+      }
+    ]);
 
-    setForm({ vehiculo: "", conductor: "", disponibilidad: "Disponible" });
-    load();
-  };
-
-  const handleEdit = (item) => {
-    setEditingId(item.id);
+    // Reinicia el formulari
     setForm({
-      vehiculo: item.vehiculo ?? "",
-      conductor: item.conductor ?? "",
-      disponibilidad: item.disponibilidad ?? "Disponible",
+      nombre: "",
+      servicio: "Otros",
+      fechaInicio: "",
+      fechaFin: "",
+      lat: "",
+      lng: ""
     });
-  };
-
-  const handleDelete = async (id) => {
-    if (!confirm("¿Eliminar voluntario?")) return;
-    await axios.delete(`${API}/${id}`);
-    load();
-  };
-
-  const handleCancel = () => {
-    setEditingId(null);
-    setForm({ vehiculo: "", conductor: "", disponibilidad: "Disponible" });
   };
 
   return (
@@ -62,24 +45,16 @@ export default function Transportes() {
         <h2 className="h4 mb-3">Transportes</h2>
 
         <form onSubmit={handleSubmit} className="row g-2 mb-3">
+          {/* ...inputs igual que abans... */}
           <div className="col-md-4">
             <input
               className="form-control"
-              placeholder="Vehículo"
-              value={form.vehiculo}
-              onChange={(e) => setForm({ ...form, vehiculo: e.target.value })}
-            />
-          </div>
-          <div className="col-md-4">
-            <input
-              className="form-control"
-              placeholder="Conductor"
-              value={form.conductor}
-              onChange={(e) => setForm({ ...form, conductor: e.target.value })}
+              placeholder="Nombre"
+              value={form.nombre}
+              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
             />
           </div>
           <div className="col-md-2">
-            <label className="form-label"></label>
             <input
               type="date"
               className="form-control"
@@ -90,7 +65,6 @@ export default function Transportes() {
             />
           </div>
           <div className="col-md-2">
-            <label className="form-label"></label>
             <input
               type="date"
               className="form-control"
@@ -101,11 +75,12 @@ export default function Transportes() {
           <div className="col-md-3">
             <select
               className="form-select"
-              value={form.disponibilidad}
+              value={form.servicio}
               onChange={(e) =>
-                setForm({ ...form, disponibilidad: e.target.value })
+                setForm({ ...form, servicio: e.target.value })
               }
             >
+              <option value="">Selecciona un servicio</option>
               <option>Acompañamiento médico</option>
               <option>Acompañamiento lúdico</option>
               <option>Terapia</option>
@@ -115,7 +90,7 @@ export default function Transportes() {
           </div>
           <div className="col-md-2">
             <input
-              className="form-control"
+              className="form-select"
               type="number"
               step="0.0001"
               placeholder="Latitud"
@@ -125,7 +100,7 @@ export default function Transportes() {
           </div>
           <div className="col-md-2">
             <input
-              className="form-control"
+              className="form-select"
               type="number"
               step="0.0001"
               placeholder="Longitud"
@@ -135,56 +110,13 @@ export default function Transportes() {
           </div>
           <div className="col-md-1 d-flex gap-2">
             <button className="btn btn-primary flex-fill" type="submit">
-              {editingId ? "Guardar" : "Agregar"}
+              Agregar
             </button>
-            {editingId && (
-              <button
-                className="btn btn-secondary"
-                type="button"
-                onClick={handleCancel}
-              >
-                Cancelar
-              </button>
-            )}
           </div>
         </form>
 
-        <div className="table-responsive">
-          <table className="table table-striped align-middle">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Servicio</th>
-                <th>Disponibilidad</th>
-              </tr>
-            </thead>
-            <tbody>
-              {list.map((t) => (
-                <tr key={t.id}>
-                  <td>{t.id}</td>
-                  <td>{t.vehiculo}</td>
-                  <td>{t.conductor || "—"}</td>
-                  <td>{t.disponibilidad}</td>
-                  <td className="d-flex gap-2">
-                    <button
-                      className="btn btn-sm btn-outline-secondary"
-                      onClick={() => handleEdit(t)}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="btn btn-sm btn-outline-danger"
-                      onClick={() => handleDelete(t.id)}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {/* Passa l'array de transports a Calendari */}
+        <Calendari transportes={transportes} />
       </div>
     </div>
   );
