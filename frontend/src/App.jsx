@@ -8,6 +8,7 @@ import Calendari from "./components/calendario/Calendari";
 import MapaVoluntarios from "./components/MapaVoluntarios";
 export default function App() {
   return (
+    <>
     <div className="container py-4">
       <h1 className="text-center mb-4">Fundación Nexa – Gestión</h1>
       <Routes>
@@ -29,5 +30,12 @@ export default function App() {
         <Route path="/mapa" element={<MapaVoluntarios />} />
       </Routes>
     </div>
+
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </Router>
+    </>
   );
 }
