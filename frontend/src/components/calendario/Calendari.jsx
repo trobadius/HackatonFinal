@@ -20,33 +20,34 @@ const Calendari = () => {
     user: '' // camp per vincular usuari
   });
 
-  // Sincronitza les tasques de localStorage amb el calendari
+  // Carrega automàticament els transports com a esdeveniments al calendari
   React.useEffect(() => {
-    const tareasGuardades = localStorage.getItem('tareas');
-    if (tareasGuardades) {
+    async function fetchTransportes() {
       try {
-        const tareasParsed = JSON.parse(tareasGuardades);
-        if (Array.isArray(tareasParsed)) {
-          // Les tasques es mostren com a events amb només el títol
-          // Ubica cada tasca al dia de creació (avui)
-          const today = new Date();
-          const yyyy = today.getFullYear();
-          const mm = String(today.getMonth() + 1).padStart(2, '0');
-          const dd = String(today.getDate()).padStart(2, '0');
-          const todayStr = `${yyyy}-${mm}-${dd}`;
-          const eventsFromTareas = tareasParsed.map(t => ({
-            id: t.id,
-            title: t.texto,
-            start: todayStr, // ubicació al calendari
-            backgroundColor: '#ffe0b2',
-            borderColor: '#ff9800'
-          }));
-          setEvents(eventsFromTareas);
+        const res = await fetch("http://localhost:5000/api/transportes");
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          const eventsFromTransportes = data
+            .filter(t => t.fechaInicio && t.fechaFin)
+            .map(t => ({
+              id: t.id,
+              title: t.nombre || t.vehiculo || "Transport",
+              start: t.fechaInicio,
+              end: t.fechaFin,
+              backgroundColor: '#e3f2fd',
+              borderColor: '#2196f3',
+              extendedProps: {
+                conductor: t.conductor,
+                disponibilidad: t.disponibilidad
+              }
+            }));
+          setEvents(eventsFromTransportes);
         }
       } catch (e) {
-        console.log("Error en afegit la tasca")
+        console.log("Error carregant transports", e);
       }
     }
+    fetchTransportes();
   }, []);
 
   // Mantinc la funció d'afegir esdeveniment manual
