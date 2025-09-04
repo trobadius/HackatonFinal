@@ -4,23 +4,22 @@ import L from "leaflet";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-// Icono personalizado para transportes
+const API = "http://localhost:5000/api/voluntariado";
 
-const API = "http://localhost:5000/api/transportes";
 
 export default function MapaVoluntarios() {
-  const [voluntarios, setVoluntarios] = useState([]);
+  const [voluntariado, setVoluntariado] = useState([]);
 
   useEffect(() => {
     axios.get(API).then((res) => {
-      setVoluntarios(res.data);
+      setVoluntariado(res.data);
     });
   }, []);
 
   return (
     <div className="card shadow-sm mt-4">
       <div className="card-body">
-        <h2 className="h4 mb-3">🚐 Ubicació de transportes</h2>
+  <h2 className="h4 mb-3">🚐 Ubicación de voluntariado</h2>
 
         <MapContainer
           center={[41.3888, 2.159]} // Barcelona
@@ -31,14 +30,13 @@ export default function MapaVoluntarios() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
           />
-          {voluntarios
-            .filter((t) => t.lat && t.lng)
-            .map((t) => (
-              <Marker key={t.id} position={[t.lat, t.lng]}>
+          {voluntariado
+            .filter((v) => v.lat && v.lng)
+            .map((v) => (
+              <Marker key={v.id} position={[v.lat, v.lng]}>
                 <Popup>
-                  🚐 <b>{t.nombre}</b> <br />
-                  👨 {t.servicio } <br />
-                  
+                  🚐 <b>{v.nombre}</b> <br />
+                  👨 {v.servicio } <br />
                 </Popup>
               </Marker>
             ))}
